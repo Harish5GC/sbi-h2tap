@@ -1,0 +1,965 @@
+<title>h2tapd Field Guide</title>
+<style>
+  :root {
+    --paper:        #F6F8FA;
+    --surface:      #FFFFFF;
+    --surface-alt:  #EAEFF4;
+    --ink:          #16202B;
+    --ink-soft:     #4A5866;
+    --ink-faint:    #7A8898;
+    --rule:         #D7DFE7;
+    --rule-soft:    #E6ECF1;
+    --accent:       #106B62;
+    --accent-ink:   #0B4F48;
+    --accent-soft:  #DEEFEC;
+    --good:         #2C7A4B;
+    --good-soft:    #E2F1E7;
+    --warn:         #9C5F16;
+    --warn-soft:    #F6EBDA;
+    --bad:          #A33636;
+    --bad-soft:     #F7E4E4;
+    --console-bg:   #12222A;
+    --console-ink:  #D3E2E0;
+    --console-dim:  #7C9490;
+    --shadow:       0 1px 2px rgba(22,32,43,.06), 0 8px 24px -12px rgba(22,32,43,.18);
+
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --serif: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:        #0E141A;
+      --surface:      #151D25;
+      --surface-alt:  #1B242D;
+      --ink:          #DCE4EB;
+      --ink-soft:     #9EABB8;
+      --ink-faint:    #6D7B88;
+      --rule:         #27343F;
+      --rule-soft:    #1E2A34;
+      --accent:       #4FB3A6;
+      --accent-ink:   #7FCCC2;
+      --accent-soft:  #12312D;
+      --good:         #63BE87;
+      --good-soft:    #16301F;
+      --warn:         #D59A4A;
+      --warn-soft:    #33260F;
+      --bad:          #E08080;
+      --bad-soft:     #351C1C;
+      --console-bg:   #090F14;
+      --console-ink:  #C9DAD8;
+      --console-dim:  #6B807D;
+      --shadow:       0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:        #0E141A;
+    --surface:      #151D25;
+    --surface-alt:  #1B242D;
+    --ink:          #DCE4EB;
+    --ink-soft:     #9EABB8;
+    --ink-faint:    #6D7B88;
+    --rule:         #27343F;
+    --rule-soft:    #1E2A34;
+    --accent:       #4FB3A6;
+    --accent-ink:   #7FCCC2;
+    --accent-soft:  #12312D;
+    --good:         #63BE87;
+    --good-soft:    #16301F;
+    --warn:         #D59A4A;
+    --warn-soft:    #33260F;
+    --bad:          #E08080;
+    --bad-soft:     #351C1C;
+    --console-bg:   #090F14;
+    --console-ink:  #C9DAD8;
+    --console-dim:  #6B807D;
+    --shadow:       0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.68;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 56px;
+  }
+
+  @media (min-width: 1080px) {
+    .wrap { grid-template-columns: 186px minmax(0, 1fr); }
+    .rail { display: block; }
+  }
+
+  /* ---------- masthead ---------- */
+
+  header.masthead {
+    grid-column: 1 / -1;
+    padding: 72px 0 40px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: .705rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(2.1rem, 5vw, 3.05rem);
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin: 0 0 20px;
+    text-wrap: balance;
+    max-width: 20ch;
+  }
+
+  .standfirst {
+    font-size: 1.14rem;
+    line-height: 1.62;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .binaries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  .binary {
+    font-family: var(--mono);
+    font-size: .78rem;
+    padding: 7px 13px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink-soft);
+  }
+  .binary b { color: var(--accent); font-weight: 600; }
+
+  /* ---------- rail ---------- */
+
+  .rail { display: none; }
+  .rail nav {
+    position: sticky;
+    top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 4px;
+  }
+  .rail a {
+    font-family: var(--mono);
+    font-size: .735rem;
+    letter-spacing: .04em;
+    color: var(--ink-faint);
+    text-decoration: none;
+    padding: 5px 0 5px 12px;
+    border-left: 2px solid var(--rule-soft);
+    transition: color .15s, border-color .15s;
+  }
+  .rail a:hover, .rail a:focus-visible {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+
+  /* ---------- content ---------- */
+
+  main { min-width: 0; max-width: 74ch; }
+
+  section { margin-bottom: 60px; scroll-margin-top: 24px; }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.62rem;
+    letter-spacing: -.012em;
+    line-height: 1.24;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+
+  .section-note {
+    font-family: var(--mono);
+    font-size: .705rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 22px;
+  }
+
+  h3 {
+    font-size: 1.03rem;
+    font-weight: 650;
+    letter-spacing: -.005em;
+    margin: 34px 0 8px;
+  }
+
+  p { margin: 0 0 16px; max-width: 68ch; }
+  main ul, main ol { margin: 0 0 16px; padding-left: 22px; max-width: 68ch; }
+  main li { margin-bottom: 8px; }
+
+  a { color: var(--accent); }
+
+  code {
+    font-family: var(--mono);
+    font-size: .855em;
+    background: var(--surface-alt);
+    border-radius: 3px;
+    padding: .12em .38em;
+    color: var(--accent-ink);
+  }
+
+  strong { font-weight: 650; }
+
+  /* ---------- console ---------- */
+
+  .console {
+    background: var(--console-bg);
+    border-radius: 5px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 0 0 20px;
+    box-shadow: var(--shadow);
+  }
+  .console pre {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: .8rem;
+    line-height: 1.62;
+    color: var(--console-ink);
+    white-space: pre;
+  }
+  .console .c { color: var(--console-dim); }
+  .console .p { color: #6FC4B8; }
+  .console .ok { color: #7ED9A0; }
+  .console .hl { color: #F0C674; }
+
+  /* ---------- callouts ---------- */
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 15px 18px;
+    border-radius: 0 4px 4px 0;
+    margin: 0 0 20px;
+    max-width: 68ch;
+  }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .note.bad  { border-left-color: var(--bad);  background: var(--bad-soft); }
+  .note p { margin: 0; font-size: .96rem; }
+  .note p + p { margin-top: 10px; }
+  .note .label {
+    display: block;
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+    color: var(--accent-ink);
+  }
+  .note.warn .label { color: var(--warn); }
+  .note.bad .label  { color: var(--bad); }
+
+  /* ---------- steps ---------- */
+
+  ol.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
+  ol.steps > li {
+    counter-increment: s;
+    position: relative;
+    padding-left: 46px;
+    margin-bottom: 30px;
+  }
+  ol.steps > li::before {
+    content: counter(s);
+    position: absolute;
+    left: 0; top: 1px;
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--surface);
+    font-family: var(--mono);
+    font-size: .8rem;
+    font-weight: 600;
+  }
+  ol.steps h3 { margin-top: 0; }
+
+  /* ---------- tables ---------- */
+
+  .tw { overflow-x: auto; margin: 0 0 20px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: .925rem;
+    min-width: 460px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px 10px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: .69rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border-bottom-color: var(--rule);
+    font-weight: 500;
+  }
+  td code { background: none; padding: 0; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: .69rem;
+    letter-spacing: .05em;
+    padding: 2px 8px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .pill.g { background: var(--good-soft); color: var(--good); }
+  .pill.w { background: var(--warn-soft); color: var(--warn); }
+  .pill.b { background: var(--bad-soft);  color: var(--bad); }
+
+  /* ---------- diagram ---------- */
+
+  figure { margin: 0 0 24px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption {
+    font-size: .87rem;
+    color: var(--ink-faint);
+    margin-top: 10px;
+    max-width: 62ch;
+  }
+
+  /* ---------- status strip ---------- */
+
+  .status {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: 20px 22px;
+    margin: 0 0 20px;
+    box-shadow: var(--shadow);
+  }
+  .status .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+    gap: 20px 18px;
+  }
+  .status .k {
+    font-family: var(--mono);
+    font-size: .67rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 5px;
+  }
+  .status .v {
+    font-family: var(--mono);
+    font-size: 1.32rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .status .v.ok { color: var(--good); }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  footer {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--rule);
+    padding-top: 22px;
+    color: var(--ink-faint);
+    font-size: .87rem;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">5G SBI packet capture</p>
+    <h1>Capturing SBI traffic without restarting anything</h1>
+    <p class="standfirst">
+      HTTP/2 compresses headers in a way that makes a mid-conversation packet capture
+      unreadable. These two tools fix that, so you can start a capture whenever you
+      like instead of bouncing network functions first.
+    </p>
+    <div class="binaries">
+      <span class="binary"><b>h2tapd</b> &nbsp;runs all the time on the NF host</span>
+      <span class="binary"><b>h2rebuild</b> &nbsp;run afterwards, on your laptop or the host</span>
+    </div>
+  </header>
+
+  <div class="rail">
+    <nav>
+      <a href="#why">Why headers vanish</a>
+      <a href="#how">How the fix works</a>
+      <a href="#deploy">Deploying it</a>
+      <a href="#capture">Taking a capture</a>
+      <a href="#reading">Reading the result</a>
+      <a href="#health">Checking health</a>
+      <a href="#gotchas">Things that bite</a>
+      <a href="#reference">Reference</a>
+      <a href="#bed">This deployment</a>
+    </nav>
+  </div>
+
+  <main>
+
+    <section id="why">
+      <h2>Why headers vanish from a capture</h2>
+      <p class="section-note">The problem in one page</p>
+
+      <p>
+        HTTP/2 avoids repeating itself. The first time an NF sends
+        <code>user-agent: SMF</code>, it spells the header out in full and both sides
+        write it down in a numbered list. Every time afterwards, it just sends the
+        number.
+      </p>
+      <p>
+        That numbered list is called the <strong>dynamic table</strong>. It is built up
+        as the conversation goes along, and it exists only in the memory of the two
+        programs talking. <strong>It is never sent across the network.</strong>
+      </p>
+      <p>
+        So if you start recording halfway through a conversation, you never saw the list
+        being built. You get the numbers but not what they mean, and Wireshark shows you
+        this:
+      </p>
+
+      <div class="console"><pre><span class="c"># the same request, captured mid-conversation</span>
+:method     PATCH
+:path       /nnrf-nfm/v1/nf-instances/bb8a6112-...
+<span class="hl">&lt;unknown&gt;</span>
+<span class="hl">&lt;unknown&gt;</span>
+<span class="hl">&lt;unknown&gt;</span></pre></div>
+
+      <p>
+        This is why testing SBI normally means restarting the network functions before
+        every capture — that forces new connections, so the capture sees the list being
+        built from scratch. It works, but it disrupts the very system you are trying to
+        observe.
+      </p>
+
+      <div class="note">
+        <span class="label">The key idea</span>
+        <p>
+          The list can't be recovered from a mid-conversation recording. But it
+          <em>can</em> be kept in memory by something that has been watching all along.
+          So the thing that has to start early is <strong>the decoder, not the capture</strong>.
+        </p>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2>How the fix works</h2>
+      <p class="section-note">Four moving parts</p>
+
+      <figure>
+        <svg viewBox="0 0 940 300" role="img" aria-label="Diagram: SBI traffic feeds h2tapd, which continuously keeps the header tables. Starting a capture produces a pcap and a snapshot together, which h2rebuild combines into a readable pcap.">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--ink-faint)"></path>
+            </marker>
+          </defs>
+
+          <rect x="4" y="112" width="132" height="66" rx="4" fill="var(--surface-alt)" stroke="var(--rule)"></rect>
+          <text x="70" y="139" text-anchor="middle" font-family="var(--sans)" font-size="13" font-weight="600" fill="var(--ink)">SBI traffic</text>
+          <text x="70" y="157" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--ink-faint)">NRF, AMF, SMF …</text>
+
+          <line x1="140" y1="145" x2="176" y2="145" stroke="var(--ink-faint)" stroke-width="1.4" marker-end="url(#ar)"></line>
+
+          <rect x="182" y="94" width="196" height="102" rx="4" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.4"></rect>
+          <text x="280" y="122" text-anchor="middle" font-family="var(--mono)" font-size="12" font-weight="600" fill="var(--accent-ink)">h2tapd</text>
+          <text x="280" y="144" text-anchor="middle" font-family="var(--sans)" font-size="12" fill="var(--ink)">always running,</text>
+          <text x="280" y="161" text-anchor="middle" font-family="var(--sans)" font-size="12" fill="var(--ink)">keeps the numbered</text>
+          <text x="280" y="178" text-anchor="middle" font-family="var(--sans)" font-size="12" fill="var(--ink)">lists in memory</text>
+
+          <path d="M 382 128 L 404 128 L 404 66 L 428 66" fill="none" stroke="var(--ink-faint)" stroke-width="1.4" marker-end="url(#ar)"></path>
+          <path d="M 382 162 L 404 162 L 404 226 L 428 226" fill="none" stroke="var(--ink-faint)" stroke-width="1.4" marker-end="url(#ar)"></path>
+
+          <rect x="434" y="38" width="164" height="56" rx="4" fill="var(--surface)" stroke="var(--rule)"></rect>
+          <text x="516" y="62" text-anchor="middle" font-family="var(--mono)" font-size="11.5" fill="var(--ink)">capture.pcap</text>
+          <text x="516" y="79" text-anchor="middle" font-family="var(--sans)" font-size="11" fill="var(--ink-faint)">the raw recording</text>
+
+          <rect x="434" y="198" width="164" height="56" rx="4" fill="var(--surface)" stroke="var(--rule)"></rect>
+          <text x="516" y="222" text-anchor="middle" font-family="var(--mono)" font-size="11.5" fill="var(--ink)">snapshot.json</text>
+          <text x="516" y="239" text-anchor="middle" font-family="var(--sans)" font-size="11" fill="var(--ink-faint)">the lists, right then</text>
+
+          <text x="516" y="152" text-anchor="middle" font-family="var(--mono)" font-size="10.5" letter-spacing="1.4" fill="var(--accent)">WRITTEN TOGETHER</text>
+          <text x="516" y="169" text-anchor="middle" font-family="var(--sans)" font-size="11" fill="var(--ink-faint)">at the same instant</text>
+
+          <path d="M 602 66 L 624 66 L 624 128 L 648 128" fill="none" stroke="var(--ink-faint)" stroke-width="1.4" marker-end="url(#ar)"></path>
+          <path d="M 602 226 L 624 226 L 624 162 L 648 162" fill="none" stroke="var(--ink-faint)" stroke-width="1.4" marker-end="url(#ar)"></path>
+
+          <rect x="654" y="112" width="118" height="66" rx="4" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.4"></rect>
+          <text x="713" y="140" text-anchor="middle" font-family="var(--mono)" font-size="12" font-weight="600" fill="var(--accent-ink)">h2rebuild</text>
+          <text x="713" y="159" text-anchor="middle" font-family="var(--sans)" font-size="11" fill="var(--ink-soft)">run later</text>
+
+          <line x1="776" y1="145" x2="806" y2="145" stroke="var(--ink-faint)" stroke-width="1.4" marker-end="url(#ar)"></line>
+
+          <rect x="812" y="112" width="124" height="66" rx="4" fill="var(--good-soft)" stroke="var(--good)" stroke-width="1.4"></rect>
+          <text x="874" y="139" text-anchor="middle" font-family="var(--sans)" font-size="12.5" font-weight="600" fill="var(--good)">readable pcap</text>
+          <text x="874" y="157" text-anchor="middle" font-family="var(--sans)" font-size="11" fill="var(--ink-soft)">open in Wireshark</text>
+        </svg>
+        <figcaption>
+          Nothing is reconfigured on the NFs, and both tools only listen — they never
+          inject traffic or touch the connections.
+        </figcaption>
+      </figure>
+
+      <h3>1. h2tapd watches, permanently</h3>
+      <p>
+        It sits on the NF host reading SBI traffic and keeps its own copy of every
+        connection's numbered list, updating as the conversation goes. It costs about
+        3 MB of memory and a tenth of one CPU core, so you leave it running forever.
+      </p>
+
+      <h3>2. Starting a capture writes two files at once</h3>
+      <p>
+        When you ask for a capture, h2tapd starts recording packets <em>and</em> writes
+        down its copy of the lists in the same moment, from the same packet stream.
+        That pairing is the whole trick: the lists are useless unless you know exactly
+        which byte of the conversation they correspond to.
+      </p>
+
+      <h3>3. h2rebuild replays the recording</h3>
+      <p>
+        Afterwards, it loads the lists, jumps to exactly the right byte, and replays your
+        whole capture from there — following every addition and removal to the lists just
+        as the NFs did.
+      </p>
+
+      <h3>4. It writes a new pcap with nothing numbered</h3>
+      <p>
+        Every header is written out in full. The result needs no lists at all, so it opens
+        in Wireshark and reads correctly from any point in the file.
+      </p>
+
+      <div class="note">
+        <span class="label">Why a snapshot at the start is enough for an hour-long capture</span>
+        <p>
+          The lists change constantly, so people reasonably assume you'd need to keep
+          re-saving them. You don't. The recording already contains every change; the
+          snapshot only has to supply the starting point. Verified on a nine-minute run:
+          540 consecutive requests on one connection decoded correctly from a single
+          snapshot taken at the start.
+        </p>
+      </div>
+    </section>
+
+    <section id="deploy">
+      <h2>Deploying it</h2>
+      <p class="section-note">Once per host</p>
+
+      <ol class="steps">
+        <li>
+          <h3>Build</h3>
+          <p>
+            Static binaries with no dependencies — nothing to install on the target, not
+            even libpcap.
+          </p>
+          <div class="console"><pre>cargo build --release --target x86_64-unknown-linux-musl</pre></div>
+        </li>
+
+        <li>
+          <h3>Copy to the host and create the output directory</h3>
+          <div class="console"><pre>scp target/x86_64-unknown-linux-musl/release/h2tapd \
+    target/x86_64-unknown-linux-musl/release/h2rebuild \
+    root@HOST:/usr/local/bin/
+
+ssh root@HOST 'chmod +x /usr/local/bin/h2*; mkdir -p /var/lib/h2tapd'</pre></div>
+        </li>
+
+        <li>
+          <h3>Find the interface the SBI traffic is actually on</h3>
+          <p>
+            This catches people out. If all your NFs run on one host, they talk to each
+            other over <strong>loopback</strong> even though their addresses look like
+            normal network addresses. Check before you guess:
+          </p>
+          <div class="console"><pre><span class="c"># does NF-to-NF traffic go over the NIC, or over lo?</span>
+ip route get 192.168.130.10 from 192.168.130.39
+<span class="c">→ local 192.168.130.10 ... dev lo</span>
+
+<span class="c"># confirm you can actually see the traffic there</span>
+tcpdump -i lo -n -c 5 'tcp port 80'</pre></div>
+        </li>
+
+        <li>
+          <h3>Install as a service</h3>
+          <p>
+            A template unit means one file covers every interface you want to watch.
+            Create <code>/etc/systemd/system/h2tapd@.service</code>:
+          </p>
+          <div class="console"><pre>[Unit]
+Description=h2tapd HPACK table keeper on %i
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/default/h2tapd-%i
+ExecStart=/usr/local/bin/h2tapd --iface %i --ports ${H2_PORTS} \
+          --api ${H2_API} --out-dir ${H2_OUTDIR} --ring-bytes ${H2_RING}
+Restart=always
+RestartSec=2
+AmbientCapabilities=CAP_NET_RAW CAP_NET_ADMIN
+
+[Install]
+WantedBy=multi-user.target</pre></div>
+          <p>Then a settings file per interface, <code>/etc/default/h2tapd-lo</code>:</p>
+          <div class="console"><pre>H2_PORTS=80
+H2_API=127.0.0.1:9099
+H2_OUTDIR=/var/lib/h2tapd/lo
+H2_RING=33554432</pre></div>
+          <div class="console"><pre>systemctl daemon-reload
+systemctl enable --now h2tapd@lo</pre></div>
+        </li>
+
+        <li>
+          <h3>Reset the existing connections, once</h3>
+          <p>
+            Connections that were already open when h2tapd started are the ones it never
+            saw from the beginning, so they still decode partially. Long-lived SBI
+            connections may never renew on their own, so give them one nudge. Restarting
+            the SBI NFs is cleanest; killing the sockets is quicker:
+          </p>
+          <div class="console"><pre><span class="c"># quicker: NFs reconnect within seconds</span>
+ss -K state established dst 192.168.130.0/24 dport = :80
+
+<span class="c"># cleaner: restart the SBI network functions</span>
+systemctl restart open5gs-nrfd open5gs-scpd open5gs-amfd ...</pre></div>
+          <p>
+            This is a <strong>one-time</strong> step, not something you repeat before
+            every capture. That is the entire point of the tool.
+          </p>
+        </li>
+
+        <li>
+          <h3>Confirm it's ready</h3>
+          <p>
+            You want <code>exact</code> to equal <code>dirs</code>. That means every
+            connection is fully understood and any capture you take will decode
+            completely.
+          </p>
+          <div class="console"><pre>curl -s localhost:9099/health
+
+<span class="ok">conns=15  dirs=30  exact=30  poisoned=0  gaps=0</span></pre></div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="capture">
+      <h2>Taking a capture</h2>
+      <p class="section-note">Every time</p>
+
+      <div class="console"><pre><span class="c"># 1. start — writes the pcap and the snapshot together</span>
+curl -XPOST localhost:9099/captures -d '{"name":"nrf-reg-test"}'
+
+<span class="p">{</span>
+  <span class="p">"capture_id"</span>:      "nrf-reg-test",
+  <span class="p">"pcap"</span>:            "/var/lib/h2tapd/lo/nrf-reg-test.pcap",
+  <span class="p">"snapshot"</span>:        "/var/lib/h2tapd/lo/nrf-reg-test.snapshot.json",
+  <span class="p">"conns_total"</span>:     15,
+  <span class="p">"conns_usable"</span>:    <span class="ok">15</span>,
+  <span class="p">"conns_degraded"</span>:  <span class="ok">0</span>
+<span class="p">}</span>
+
+<span class="c"># 2. run your test traffic …</span>
+
+<span class="c"># 3. stop</span>
+curl -XDELETE localhost:9099/captures/nrf-reg-test</pre></div>
+
+      <div class="note warn">
+        <span class="label">Check this before you run the test, not after</span>
+        <p>
+          <code>conns_degraded</code> tells you up front which connections can't be
+          vouched for, and each one comes with a reason. Finding out now costs you
+          nothing; finding out after an hour of analysis costs you the hour.
+        </p>
+      </div>
+
+      <p>
+        Connections that start <em>during</em> your capture need no snapshot at all —
+        they're recorded from their first packet, so they're understood from first
+        principles.
+      </p>
+    </section>
+
+    <section id="reading">
+      <h2>Reading the result</h2>
+      <p class="section-note">Turning the recording into something you can open</p>
+
+      <div class="console"><pre>h2rebuild -r nrf-reg-test.pcap \
+          -s nrf-reg-test.snapshot.json \
+          -w nrf-reg-test-readable.pcap \
+          --jsonl decoded.jsonl
+
+packets in/out    1932 -&gt; 1061
+connections       16 (32 seeded from snapshot)
+header blocks     <span class="ok">381 (381 fully decoded, 0 partial)</span></pre></div>
+
+      <p>
+        Open <code>nrf-reg-test-readable.pcap</code> in Wireshark. Every header is spelled
+        out, so it reads correctly no matter where you jump to in the file.
+      </p>
+      <p>
+        <code>--jsonl</code> additionally writes one JSON line per request or response, if
+        you'd rather grep or diff than click. It roughly triples the run time, so leave it
+        off when you only want the pcap.
+      </p>
+
+      <h3>What "missing" looks like</h3>
+      <p>
+        The tool never invents a header. If something genuinely can't be recovered, it
+        says so in place, and you can search for it:
+      </p>
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>What you see</th><th>What it means</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>@unresolved-idx-63</code></td>
+              <td>A number whose meaning was set before the tool started watching. An honest gap.</td>
+            </tr>
+            <tr>
+              <td><code>@hpack-decode-failed</code></td>
+              <td>A header block that couldn't be read at all — shown rather than silently dropped.</td>
+            </tr>
+            <tr>
+              <td><code>pre-snapshot skip</code></td>
+              <td>A few hundred bytes recorded just <em>before</em> the capture point. Traffic from before you pressed start, not part of your test.</td>
+            </tr>
+            <tr>
+              <td><code>MISALIGNED</code></td>
+              <td>The recording and the lists don't line up, so the lists were not applied. Never a wrong answer.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="health">
+      <h2>Checking health</h2>
+      <p class="section-note">Two commands worth knowing</p>
+
+      <p>
+        <code>GET /health</code> is the one to glance at before and after a long capture.
+        The number that matters is <code>reassembly_gaps</code>: it counts moments where
+        h2tapd missed a packet, which is the only thing that degrades a long recording.
+      </p>
+
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>Field</th><th>Healthy</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>exact</code> vs <code>dirs</code></td><td><span class="pill g">equal</span></td><td>Every connection fully understood</td></tr>
+            <tr><td><code>reassembly_gaps</code></td><td><span class="pill g">0</span></td><td>No packets missed</td></tr>
+            <tr><td><code>dirs_poisoned</code></td><td><span class="pill g">0</span></td><td>No connection has lost its place</td></tr>
+            <tr><td><code>conns_degraded</code></td><td><span class="pill g">0</span></td><td>Every connection safe to rebuild</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        <code>GET /connections</code> gives the same picture per connection, with the
+        reason attached whenever something isn't right.
+      </p>
+    </section>
+
+    <section id="gotchas">
+      <h2>Things that will bite you</h2>
+      <p class="section-note">Learned the hard way, so you don't have to</p>
+
+      <div class="note bad">
+        <span class="label">Restarting h2tapd wipes everything it knows</span>
+        <p>
+          All the numbered lists live in memory. If you restart or upgrade the daemon,
+          live connections drop back to partial decoding until they renew — so reset the
+          connections again afterwards, exactly as you did on first install.
+        </p>
+      </div>
+
+      <div class="note warn">
+        <span class="label">Watch on the same segment as the traffic</span>
+        <p>
+          If there's a SEPP, a proxy or a service mesh between the two NFs, that's a
+          different conversation with a different set of lists. h2tapd has to be watching
+          the same hop your capture covers.
+        </p>
+      </div>
+
+      <div class="note warn">
+        <span class="label">The rebuilt pcap is for reading, not for TCP forensics</span>
+        <p>
+          Headers, payloads, stream IDs, ordering and timestamps are all faithful. The TCP
+          layer underneath is regenerated, so packet boundaries, sequence numbers and
+          retransmissions are not the originals. Keep the original file for anything at
+          that level.
+        </p>
+      </div>
+
+      <div class="note warn">
+        <span class="label">Plaintext only</span>
+        <p>
+          If SBI runs over TLS, the compression happens inside the encryption and none of
+          this applies without keys.
+        </p>
+      </div>
+
+      <div class="note">
+        <span class="label">Keep the ring buffer short</span>
+        <p>
+          <code>--ring-secs</code> (default 5) matters more than <code>--ring-bytes</code>.
+          It only exists to complete a half-received message. Set it to hours and your
+          captures fill with long-dead connections the snapshot knows nothing about — the
+          capture then looks broken when it isn't.
+        </p>
+      </div>
+    </section>
+
+    <section id="reference">
+      <h2>Reference</h2>
+      <p class="section-note">Options and endpoints</p>
+
+      <h3>h2tapd options</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Option</th><th>Default</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>--iface</code></td><td class="num">—</td><td>Interface to watch. Required.</td></tr>
+            <tr><td><code>--ports</code></td><td class="num">—</td><td>SBI ports. Lists and ranges: <code>80,8080,29500-29520</code></td></tr>
+            <tr><td><code>--api</code></td><td class="num">127.0.0.1:9099</td><td>Where the control API listens</td></tr>
+            <tr><td><code>--out-dir</code></td><td class="num">./captures</td><td>Where captures and snapshots land</td></tr>
+            <tr><td><code>--ring-secs</code></td><td class="num">5</td><td>How far back the buffer reaches</td></tr>
+            <tr><td><code>--max-conns</code></td><td class="num">20000</td><td>Connection ceiling, ~8 KB each</td></tr>
+            <tr><td><code>--max-table-bytes</code></td><td class="num">4 MiB</td><td>Largest per-connection list it will hold</td></tr>
+            <tr><td><code>--idle-secs</code></td><td class="num">300</td><td>Drop connections quiet for this long</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Control API</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Endpoint</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /health</code></td><td>Counts, gaps, ring state, running capture</td></tr>
+            <tr><td><code>GET /connections</code></td><td>Per-connection detail with reasons</td></tr>
+            <tr><td><code>POST /captures</code></td><td>Start. Body <code>{"name","pcap","snapshot"}</code>, all optional</td></tr>
+            <tr><td><code>DELETE /captures/{id}</code></td><td>Stop and report totals</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>One capture runs at a time.</p>
+
+      <h3>h2rebuild options</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Option</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>-r</code></td><td>The capture to read</td></tr>
+            <tr><td><code>-s</code></td><td>The snapshot that came with it</td></tr>
+            <tr><td><code>-w</code></td><td>The readable pcap to write</td></tr>
+            <tr><td><code>--jsonl</code></td><td>Also write decoded headers as JSON lines</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Performance</h3>
+      <p>
+        Measured on a Xeon 8260 with 231,840 packets across 1,920 connections.
+        Memory for the rebuild is roughly <code>24 MB + 2.2 × the pcap size</code>, so a
+        1 GB capture wants about 2.2 GB of RAM.
+      </p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Measure</th><th class="num">Value</th></tr></thead>
+          <tbody>
+            <tr><td>h2tapd memory</td><td class="num">~3 MB</td></tr>
+            <tr><td>h2tapd CPU</td><td class="num">0.10%</td></tr>
+            <tr><td>Rebuild, per 100 packets</td><td class="num">0.33 ms</td></tr>
+            <tr><td>Rebuild, per 100 packets with <code>--jsonl</code></td><td class="num">0.84 ms</td></tr>
+            <tr><td>Rebuild throughput</td><td class="num">~45 MB/s</td></tr>
+            <tr><td>Binary sizes</td><td class="num">2.0 MB / 1.5 MB</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="bed">
+      <h2>This deployment</h2>
+      <p class="section-note">10.30.31.112 — Open5GS</p>
+
+      <div class="status">
+        <div class="grid">
+          <div><div class="k">Connections</div><div class="v">15</div></div>
+          <div><div class="k">Directions</div><div class="v">30</div></div>
+          <div><div class="k">Exact</div><div class="v ok">30</div></div>
+          <div><div class="k">Poisoned</div><div class="v ok">0</div></div>
+          <div><div class="k">Gaps</div><div class="v ok">0</div></div>
+        </div>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Item</th><th>Where</th></tr></thead>
+          <tbody>
+            <tr><td>Service, loopback (this is where SBI is)</td><td><code>h2tapd@lo</code> — API <code>127.0.0.1:9099</code></td></tr>
+            <tr><td>Service, NIC (standing by, idle)</td><td><code>h2tapd@enp8s0</code> — API <code>127.0.0.1:9100</code></td></tr>
+            <tr><td>Binaries</td><td><code>/usr/local/bin/h2tapd</code>, <code>h2rebuild</code></td></tr>
+            <tr><td>Captures</td><td><code>/var/lib/h2tapd/lo/</code></td></tr>
+            <tr><td>Full technical README</td><td><code>/usr/local/share/h2tapd/README.md</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Both services are enabled at boot. SBI here runs on port 80 over loopback, between
+        the <code>192.168.130.x</code> addresses on <code>enp8s0</code> — which is why
+        <code>lo</code> is the interface being watched and <code>enp8s0</code> sees nothing.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    h2tapd and h2rebuild — passive HPACK table keeper and capture normalizer for 5G SBI.
+    54 tests, including the RFC 7541 reference vectors.
+  </footer>
+
+</div>

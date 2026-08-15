@@ -1,0 +1,13 @@
+[package]
+name = "h2core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Shared HTTP/2 framing, HPACK state and TCP reassembly for h2tapd and h2rebuild"
+
+[dependencies]
+httlib-huffman = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

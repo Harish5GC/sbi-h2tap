@@ -1,0 +1,15 @@
+# Build output
+/target
+
+# Capture artifacts. Binary, reproducible, and they contain real lab traffic
+# (SUPIs, NF instance IDs) that has no business in source control.
+*.pcap
+*.pcapng
+*.jsonl
+*.snapshot.json
+
+# Local editor/tooling state
+.claude/settings.local.json
+
+# Local capture output from scripts/capture.sh
+/captures/

@@ -1,0 +1,12 @@
+[package]
+name = "h2rebuild"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Rebuild an HTTP/2 capture with HPACK removed, using an h2tapd snapshot"
+
+[dependencies]
+h2core = { path = "../h2core" }
+clap = { workspace = true }
+serde_json = { workspace = true }
+pcap-file = { workspace = true }

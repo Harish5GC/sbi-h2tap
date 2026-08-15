@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = ["crates/h2core", "crates/h2tapd", "crates/h2rebuild"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[workspace.dependencies]
+httlib-huffman = "0.3.4"
+etherparse = "0.21"
+pcap-file = "2.0"
+pnet_datalink = "0.35"
+libc = "0.2"
+tiny_http = "0.12"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
