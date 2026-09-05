@@ -355,3 +355,19 @@ conversation in which the second request references table entries the first one
 inserted, capture only the second request, and assert the rebuilt pcap decodes
 those headers correctly — and that without a snapshot the same input produces
 visible `@unresolved-idx-N` gaps instead of invented values.
+
+## Licence
+
+Dual licensed under either of
+
+* Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
+  <http://www.apache.org/licenses/LICENSE-2.0>)
+* MIT licence ([LICENSE-MIT](LICENSE-MIT) or
+  <http://opensource.org/licenses/MIT>)
+
+at your option. This is the Rust ecosystem convention: the MIT half is short
+and permissive, and the Apache half adds an explicit patent grant.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in this work by you, as defined in the Apache-2.0 licence, shall
+be dual licensed as above, without any additional terms or conditions.

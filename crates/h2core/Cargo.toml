@@ -9,6 +9,7 @@ keywords = ["hpack", "http2", "pcap", "tcp", "5g"]
 categories = ["network-programming", "parser-implementations", "encoding"]
 repository.workspace = true
 homepage.workspace = true
+license.workspace = true
 readme.workspace = true
 authors.workspace = true
 

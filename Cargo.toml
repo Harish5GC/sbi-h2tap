@@ -9,6 +9,7 @@ rust-version = "1.75"
 authors = ["Harish <knharish@telaverge.com>"]
 repository = "https://github.com/Harish5GC/sbi-h2tap"
 homepage = "https://github.com/Harish5GC/sbi-h2tap"
+license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [workspace.dependencies]

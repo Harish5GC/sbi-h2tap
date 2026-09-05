@@ -9,6 +9,7 @@ keywords = ["hpack", "http2", "pcap", "5g", "sbi"]
 categories = ["network-programming", "command-line-utilities", "development-tools::debugging"]
 repository.workspace = true
 homepage.workspace = true
+license.workspace = true
 readme.workspace = true
 authors.workspace = true
 
