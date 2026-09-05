@@ -3,7 +3,14 @@ name = "h2tapd"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-description = "Passive HPACK dynamic-table keeper and capture control plane for 5G SBI"
+description = "Passively keeps HPACK dynamic tables for HTTP/2 5G SBI traffic, so a pcap started mid-connection still decodes"
+
+keywords = ["hpack", "http2", "pcap", "5g", "sbi"]
+categories = ["network-programming", "command-line-utilities", "development-tools::debugging"]
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+authors.workspace = true
 
 [dependencies]
 h2core = { path = "../h2core" }

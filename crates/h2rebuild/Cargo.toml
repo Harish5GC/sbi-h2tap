@@ -3,7 +3,14 @@ name = "h2rebuild"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-description = "Rebuild an HTTP/2 capture with HPACK removed, using an h2tapd snapshot"
+description = "Rewrites an HTTP/2 pcap with HPACK decompressed, so headers decode in Wireshark from any point in the file"
+
+keywords = ["hpack", "http2", "pcap", "wireshark", "decode"]
+categories = ["network-programming", "command-line-utilities", "encoding"]
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+authors.workspace = true
 
 [dependencies]
 h2core = { path = "../h2core" }

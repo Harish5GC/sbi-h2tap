@@ -6,6 +6,10 @@ members = ["crates/h2core", "crates/h2tapd", "crates/h2rebuild"]
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.75"
+authors = ["Harish <knharish@telaverge.com>"]
+repository = "https://github.com/Harish5GC/sbi-h2tap"
+homepage = "https://github.com/Harish5GC/sbi-h2tap"
+readme = "README.md"
 
 [workspace.dependencies]
 httlib-huffman = "0.3.4"

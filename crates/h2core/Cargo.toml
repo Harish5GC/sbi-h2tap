@@ -3,7 +3,14 @@ name = "h2core"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-description = "Shared HTTP/2 framing, HPACK state and TCP reassembly for h2tapd and h2rebuild"
+description = "HPACK, HTTP/2 framing, TCP reassembly and pcap packet handling shared by h2tapd and h2rebuild"
+
+keywords = ["hpack", "http2", "pcap", "tcp", "5g"]
+categories = ["network-programming", "parser-implementations", "encoding"]
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+authors.workspace = true
 
 [dependencies]
 httlib-huffman = { workspace = true }

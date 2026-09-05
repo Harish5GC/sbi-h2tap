@@ -1,12 +1,32 @@
-# h2tapd / h2rebuild
+# sbi-h2tap — decode HPACK headers in 5G SBI packet captures
 
-Capture 5G SBI traffic **without restarting anything**, and get headers that
-decode.
+`h2tapd` + `h2rebuild`: capture 5G SBI (HTTP/2) traffic **without restarting your
+network functions**, and get headers that actually decode in Wireshark.
+
+If you have ever opened a 5G core capture and found `:authority`, `user-agent`
+and `3gpp-Sbi-*` headers rendered as `<unknown>`, this is the fix. HTTP/2
+compresses headers with HPACK, whose *dynamic table* lives only in the two
+endpoints' memory and never crosses the wire — so a pcap that starts
+mid-connection has the indices but not their meanings. The usual workaround is
+restarting the NFs before every capture. This replaces that.
+
+Deployed and verified against **Open5GS**; the approach is stack-agnostic and
+applies equally to free5GC, nghttp2, Go `net/http2` or Envoy. Plaintext SBI
+only — see [Limits](#limits).
+
+**Keywords:** HPACK · HTTP/2 · h2 · header decompression · dynamic table ·
+5G core · SBI · service based interface · 3GPP · NRF · AMF · SMF · SCP ·
+Open5GS · free5GC · pcap · Wireshark · tshark · tcpdump · packet capture ·
+AF_PACKET · TCP reassembly · Rust
 
 > **New here?** There is a plain-language guide covering how it works, how to
-> deploy it, and how to use it day to day:
-> This README is the technical reference. It assumes you know what HPACK is.
+> deploy it and how to use it day to day:
+> https://claude.ai/code/artifact/231ec7b8-1750-46f0-adf0-d69c881514fd
 >
+> This README is the technical reference; it assumes you know what HPACK is.
+> `HANDOFF.md` is the engineering record: decisions and their reasons, the bugs
+> found during deployment, measured performance, and the operational runbook.
+
 ## In one minute
 
 HTTP/2 doesn't repeat itself. The first time an NF sends `user-agent: SMF` it
